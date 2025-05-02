@@ -1,34 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react"
+import { useEffect } from "react"
+import { useAuthStore } from "./stores/authStore"
+import {Loader} from 'lucide-react'
+import Navbar from "./components/Navbar"
+import { Toaster } from "react-hot-toast"
+import { Routes,Route, Navigate } from "react-router-dom"
+// importinf pages 
+import SignupPage from "./pages/SignupPage"
+import LoginPage from "./pages/LoginPage"
+import UserProfile from "./pages/UserProfile"
+import DashboardPage from "./pages/DashboardPage"
+import CreateTeamPage from "./pages/CreateTeamPage"
+import TeamsPage from "./pages/TeamsPage"
+import ViewTeam from "./pages/ViewTeam"
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const App = () => {
+  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
+  useEffect(
+    ()=>{
+      checkAuth()
+    }, [checkAuth]
+  );
+  // if user being verified show loadin
+  if(isCheckingAuth && !authUser){
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <Loader className='size-10 animate-spin'/>
+      </div>
+    )
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <Navbar/>
+        {/* roouting */}
+        <Routes>  
+            <Route path="/" element={ authUser ?  <TeamsPage /> : <LoginPage /> } />
+            <Route path="/login" element ={ !authUser ? <LoginPage/> : <Navigate to="/" /> }/>
+            <Route path="/signup" element ={ !authUser ? <SignupPage/> : <Navigate to="/" /> }/>
+            <Route path="/profile" element = { authUser? <UserProfile/> : <Navigate to="/login"/>} />
+            <Route path="/create-team" element = { authUser? <CreateTeamPage/> : <Navigate to="/login"/>} />
+            {/* <Route path="/teams" element = { authUser? <TeamsPage/> : <Navigate to="/login"/>} /> */}
+            <Route path="/view-team/:teamId" element = { authUser? <ViewTeam/> : <Navigate to="/login"/>} />
+
+
+        </Routes>
+      <Toaster position="top-right"/>
+    </div>
   )
 }
 

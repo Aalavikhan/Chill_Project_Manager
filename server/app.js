@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import { connectDB } from './utils/dbConfig.js';
 import { authRouter } from './routes/authRoutes.js';
+import { teamRouter } from './routes/teamRoutes.js';
 dotenv.config();
 
 const port = process.env.PORT || 8080;
@@ -16,6 +17,7 @@ app.use(cors({
     credentials: true
 }));
 app.use("/api/auth",authRouter);
+app.use("/api/teams",teamRouter);
 
 app.listen( port, ()=>{
     console.log("Server started on port", port);
