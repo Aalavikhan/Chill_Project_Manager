@@ -2,16 +2,19 @@
   "name": "server",
   "version": "1.0.0",
   "main": "app.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
-    "dev" : "nodemon app.js"
+    "dev": "nodemon app.js",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "supertest": "^7.1.0",
+    "vitest": "^3.1.2"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -22,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.13.1",
     "sslcommerz-lts": "^1.1.0"
   }
