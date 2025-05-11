@@ -34,6 +34,11 @@ const projectSchema = new mongoose.Schema({
   teams: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team'
+  }],
+  
+  tasks: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Task'
   }]
 }, {
   timestamps: true

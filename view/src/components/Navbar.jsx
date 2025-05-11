@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import {
   Bell, User, LockKeyhole,
   LayoutDashboard, ClipboardList,
-  Users, CalendarDays, BarChart2, UserPlus
+  Users, CalendarDays, BarChart2, UserPlus, Calendar
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,7 +25,7 @@ const Navbar = () => {
     { path: '/', name: 'Team', icon: <Users size={20} /> },
     { path: '/create-team', name: 'Create Team', icon: <UserPlus size={20} /> },
     { path: '/projects', name: 'Projects', icon: <ClipboardList size={20} /> },
-    { path: '/tasks', name: 'Tasks', icon: <ClipboardList size={20} /> },
+    { path: '/tasks', name: 'Tasks', icon: <Calendar size={20} /> },
     { path: '/reports', name: 'Reports', icon: <BarChart2 size={20} /> },
     
   ];

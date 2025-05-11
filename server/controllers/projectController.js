@@ -9,10 +9,16 @@ export const createProject = async (req, res) => {
     const { name, description } = req.body;
     const userId = req.user.id;
 
+    console.log('Creating project with name:', name);
+    console.log('Description:', description);
+    console.log('User ID:', userId);
+
     if (!name) {
+      console.log('Error: Project name is missing');
       return res.status(400).json({ message: "Project name is required" });
     }
 
+    console.log('Creating new project document');
     const newProject = new Project({
       name,
       description: description || '',
@@ -20,13 +26,24 @@ export const createProject = async (req, res) => {
       members: [{ user: userId, role: 'Owner' }]
     });
 
+    console.log('New project document:', JSON.stringify(newProject));
+    
+    console.log('Saving project to database');
     await newProject.save();
+    console.log('Project saved successfully with ID:', newProject._id);
 
     // Add project to user's projects
-    await User.findByIdAndUpdate(userId, {
+    console.log('Updating user document with project reference');
+    const userUpdateResult = await User.findByIdAndUpdate(userId, {
       $push: { projects: newProject._id }
-    });
+    }, { new: true });
+    
+    console.log('User update result:', userUpdateResult ? 'Success' : 'Failed');
+    if (!userUpdateResult) {
+      console.log('Warning: User document not found or not updated');
+    }
 
+    console.log('Project creation completed successfully');
     return res.status(201).json({
       success: true,
       message: "Project created successfully",
@@ -34,6 +51,8 @@ export const createProject = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating project:", error);
+    console.error("Error details:", error.message);
+    console.error("Error stack:", error.stack);
     return res.status(500).json({
       success: false,
       message: "Failed to create project",
@@ -46,7 +65,9 @@ export const createProject = async (req, res) => {
 export const getUserProjects = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log('Fetching projects for user ID:', userId);
 
+    console.log('Finding user document and populating projects');
     const user = await User.findById(userId).populate({
       path: 'projects',
       populate: [
@@ -57,20 +78,36 @@ export const getUserProjects = async (req, res) => {
         {
           path: 'teams',
           select: 'name description'
+        },
+        {
+          path: 'tasks',
+          select: 'title status priority dueDate'
         }
       ]
     });
 
     if (!user) {
+      console.log('User not found with ID:', userId);
       return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log(`Found user: ${user.name}, Email: ${user.email}`);
+    console.log(`User has ${user.projects ? user.projects.length : 0} projects`);
+    
+    if (user.projects && user.projects.length > 0) {
+      console.log('Project IDs:', user.projects.map(p => p._id));
+    } else {
+      console.log('User has no projects');
     }
 
     return res.status(200).json({
       success: true,
-      projects: user.projects
+      projects: user.projects || []
     });
   } catch (error) {
     console.error("Error fetching user projects:", error);
+    console.error("Error details:", error.message);
+    console.error("Error stack:", error.stack);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch projects",
@@ -98,6 +135,13 @@ export const getProjectById = async (req, res) => {
         path: 'teams',
         populate: {
           path: 'members.user',
+          select: 'name email profileImage'
+        }
+      })
+      .populate({
+        path: 'tasks',
+        populate: {
+          path: 'assignee',
           select: 'name email profileImage'
         }
       });

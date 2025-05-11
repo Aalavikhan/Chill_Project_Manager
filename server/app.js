@@ -6,6 +6,7 @@ import { connectDB } from './utils/dbConfig.js';
 import { authRouter } from './routes/authRoutes.js';
 import { teamRouter } from './routes/teamRoutes.js';
 import projectRouter from './routes/projectRoutes.js';
+import taskRouter from './routes/taskRoutes.js';
 dotenv.config();
 
 const port = process.env.PORT || 8080;
@@ -14,12 +15,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-    origin : 'http://localhost:5173',
+    origin : ['http://localhost:5173', 'http://localhost:5175'],
     credentials: true
 }));
 app.use("/api/auth",authRouter);
 app.use("/api/teams",teamRouter);
 app.use("/api/projects", projectRouter);
+app.use("/api", taskRouter);
 
 app.listen( port, ()=>{
     console.log("Server started on port", port);
