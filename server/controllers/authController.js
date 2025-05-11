@@ -138,4 +138,34 @@ export const updateProfile = async (req, res) => {
     }
 }
 
+// Search for users by name or email
+export const searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || query.trim().length < 2) {
+      return res.status(400).json({ message: "Search query must be at least 2 characters" });
+    }
+
+    const users = await User.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } }
+      ]
+    }).select('name email profileImage');
+
+    return res.status(200).json({
+      success: true,
+      users
+    });
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to search users",
+      error: error.message
+    });
+  }
+};
+
 

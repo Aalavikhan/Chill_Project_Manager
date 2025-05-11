@@ -259,4 +259,35 @@ export const assignRoleController = async (req, res) => {
   };
   
 
+// Search for teams by name
+export const searchTeams = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const userId = req.user.id;
+    
+    if (!query || query.trim().length < 2) {
+      return res.status(400).json({ message: "Search query must be at least 2 characters" });
+    }
+
+    // Find teams that match the query and where the user is a member
+    const teams = await Team.find({
+      name: { $regex: query, $options: 'i' },
+      'members.user': userId
+    }).select('name description');
+
+    return res.status(200).json({
+      success: true,
+      teams
+    });
+  } catch (error) {
+    console.error("Error searching teams:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to search teams",
+      error: error.message
+    });
+  }
+};
+
+
 

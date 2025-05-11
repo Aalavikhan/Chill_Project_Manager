@@ -13,6 +13,8 @@ import DashboardPage from "./pages/DashboardPage"
 import CreateTeamPage from "./pages/CreateTeamPage"
 import TeamsPage from "./pages/TeamsPage"
 import ViewTeam from "./pages/ViewTeam"
+import ProjectsPage from "./pages/ProjectsPage"
+import ProjectDetailPage from "./pages/ProjectDetailPage"
 
 
 const App = () => {
@@ -43,7 +45,8 @@ const App = () => {
             <Route path="/create-team" element = { authUser? <CreateTeamPage/> : <Navigate to="/login"/>} />
             {/* <Route path="/teams" element = { authUser? <TeamsPage/> : <Navigate to="/login"/>} /> */}
             <Route path="/view-team/:teamId" element = { authUser? <ViewTeam/> : <Navigate to="/login"/>} />
-
+            <Route path="/projects" element = { authUser? <ProjectsPage/> : <Navigate to="/login"/>} />
+            <Route path="/projects/:projectId" element = { authUser? <ProjectDetailPage/> : <Navigate to="/login"/>} />
 
         </Routes>
       <Toaster position="top-right"/>

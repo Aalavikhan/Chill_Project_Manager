@@ -20,3 +20,6 @@ export const authenticate = async ( req , res , next ) => {
         return res.status(500).json( {msg : "Internal server error"});
     }
 };
+
+// Add verifyToken as an alias for authenticate
+export const verifyToken = authenticate;
