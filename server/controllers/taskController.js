@@ -1,13 +1,14 @@
 import { Task } from '../models/taskModel.js';
 import { Project } from '../models/projectModel.js';
 import { User } from '../models/userModel.js';
+import { ActivityLog } from '../models/activityLogModel.js';
 import mongoose from 'mongoose';
 
 // Create a new task
 export const createTask = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { title, description, assigneeId, dueDate, priority, status } = req.body;
+    const { title, description, assigneeId, dueDate, priority, status, kanbanColumn } = req.body;
     const userId = req.user.id;
 
     if (!mongoose.Types.ObjectId.isValid(projectId) || !mongoose.Types.ObjectId.isValid(assigneeId)) {
@@ -58,7 +59,8 @@ export const createTask = async (req, res) => {
       creator: userId,
       dueDate,
       priority: priority || 'Medium',
-      status: status || 'Assigned'
+      status: status || 'To Do',
+      kanbanColumn: kanbanColumn || status || 'To Do'
     });
 
     await newTask.save();
@@ -70,6 +72,19 @@ export const createTask = async (req, res) => {
     // Populate assignee details
     const populatedTask = await Task.findById(newTask._id)
       .populate('assignee', 'name email profileImage');
+
+    // Log the activity
+    await ActivityLog.create({
+      userId,
+      entityType: 'Task',
+      entityId: newTask._id,
+      action: 'Created',
+      details: { 
+        taskTitle: title,
+        assigneeId 
+      },
+      projectId
+    });
 
     return res.status(201).json({
       success: true,
@@ -175,7 +190,7 @@ export const getTaskById = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { projectId, taskId } = req.params;
-    const { title, description, assigneeId, dueDate, priority, status } = req.body;
+    const { title, description, assigneeId, dueDate, priority, status, kanbanColumn } = req.body;
     const userId = req.user.id;
 
     if (!mongoose.Types.ObjectId.isValid(projectId) || !mongoose.Types.ObjectId.isValid(taskId)) {
@@ -244,6 +259,7 @@ export const updateTask = async (req, res) => {
     if (dueDate) task.dueDate = dueDate;
     if (priority) task.priority = priority;
     if (status) task.status = status;
+    if (kanbanColumn) task.kanbanColumn = kanbanColumn;
 
     await task.save();
 
@@ -251,6 +267,19 @@ export const updateTask = async (req, res) => {
     const updatedTask = await Task.findById(task._id)
       .populate('assignee', 'name email profileImage')
       .populate('creator', 'name email');
+
+    // Log the activity
+    await ActivityLog.create({
+      userId,
+      entityType: 'Task',
+      entityId: task._id,
+      action: 'Updated',
+      details: { 
+        taskTitle: task.title,
+        updates: req.body 
+      },
+      projectId
+    });
 
     return res.status(200).json({
       success: true,
@@ -304,6 +333,18 @@ export const deleteTask = async (req, res) => {
     // Remove task from project's tasks array
     project.tasks = project.tasks.filter(id => id.toString() !== taskId);
     await project.save();
+
+    // Log the activity
+    await ActivityLog.create({
+      userId,
+      entityType: 'Task',
+      entityId: taskId,
+      action: 'Deleted',
+      details: { 
+        taskTitle: task.title
+      },
+      projectId
+    });
 
     return res.status(200).json({
       success: true,

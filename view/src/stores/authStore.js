@@ -10,7 +10,7 @@ export const useAuthStore = create( (set,get)=> ({
     isSigning : false,
     checkAuth : async ()=> {
         try {
-            const res = await axiosInstance.get("/auth/check");
+            const res = await axiosInstance.get("/auth/me");
             set( { authUser : res.data});
         } catch (error) {
             console.log( "Error in authentication", error);
@@ -54,6 +54,8 @@ export const useAuthStore = create( (set,get)=> ({
         }
     },
     
-    
+    updateAuthUser: (userData) => {
+        set({ authUser: { ...get().authUser, ...userData }});
+    }
 
 }));

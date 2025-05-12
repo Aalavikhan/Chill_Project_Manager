@@ -36,8 +36,31 @@ const taskSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Assigned', 'Ongoing', 'Completed'],
-    default: 'Assigned'
+    enum: ['To Do', 'In Progress', 'Done'],
+    default: 'To Do'
+  },
+  kanbanColumn: {
+    type: String,
+    default: 'To Do'
+  },
+  tags: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Tag'
+  }],
+  attachments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Attachment'
+  }],
+  comments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment'
+  }],
+  // For calendar view
+  startDate: {
+    type: Date
+  },
+  completedAt: {
+    type: Date
   }
 }, { timestamps: true });
 

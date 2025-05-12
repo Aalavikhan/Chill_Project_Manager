@@ -8,7 +8,7 @@ const EditTaskModal = ({ isOpen, onClose, onUpdateTask, task, projectMembers, pr
     assigneeId: '',
     dueDate: '',
     priority: 'Medium',
-    status: 'Assigned'
+    status: 'To Do'
   });
 
   // Initialize form data when task changes
@@ -23,7 +23,7 @@ const EditTaskModal = ({ isOpen, onClose, onUpdateTask, task, projectMembers, pr
         assigneeId: task.assignee?._id || '',
         dueDate: formattedDate,
         priority: task.priority || 'Medium',
-        status: task.status || 'Assigned'
+        status: task.status || 'To Do'
       });
     }
   }, [task]);
@@ -171,9 +171,9 @@ const EditTaskModal = ({ isOpen, onClose, onUpdateTask, task, projectMembers, pr
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-900/50 text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 border border-gray-600/50"
             >
-              <option value="Assigned">Assigned</option>
-              <option value="Ongoing">Ongoing</option>
-              <option value="Completed">Completed</option>
+              <option value="To Do">To Do</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
             </select>
           </div>
 

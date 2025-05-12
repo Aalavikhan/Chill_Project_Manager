@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, ArrowLeft, Calendar, Clock, AlertTriangle, CheckCircle, Users, Edit } from 'lucide-react';
+import { Plus, ArrowLeft, Calendar, Clock, AlertTriangle, CheckCircle, Users, Edit, Search, Filter, SlidersHorizontal, RefreshCw, FileText } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import CreateTaskModal from '../components/CreateTaskModal';
@@ -297,15 +297,31 @@ const ProjectTasksPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 p-6">
-      <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => navigate('/tasks')}
-          className="flex items-center gap-2 text-gray-300 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft size={18} />
-          Back to Tasks
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 pt-24">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigate(`/projects/${projectId}`)}
+            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+          >
+            <ArrowLeft size={18} />
+            Back to Project
+          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(`/reports/project/${projectId}`)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 hover:bg-purple-700 transition-colors"
+            >
+              <FileText size={18} /> Reports
+            </button>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={18} /> New Task
+            </button>
+          </div>
+        </div>
 
         <div className="bg-gray-800/80 backdrop-blur-md rounded-xl shadow-2xl border border-gray-700/50 p-6 mb-8">
           <div className="flex justify-between items-start">

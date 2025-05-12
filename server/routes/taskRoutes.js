@@ -17,4 +17,7 @@ router.get('/projects/:projectId/tasks/:taskId', verifyToken, getTaskById);
 router.patch('/projects/:projectId/tasks/:taskId', verifyToken, updateTask);
 router.delete('/projects/:projectId/tasks/:taskId', verifyToken, deleteTask);
 
+// Additional routes to match frontend API calls
+router.get('/tasks/project/:projectId', verifyToken, getProjectTasks);
+
 export default router; 

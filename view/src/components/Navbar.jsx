@@ -1,17 +1,32 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import {
   Bell, User, LockKeyhole,
   LayoutDashboard, ClipboardList,
-  Users, CalendarDays, BarChart2, UserPlus, Calendar
+  Users, CalendarDays, BarChart2, UserPlus, Calendar, FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
   const { authUser, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeProjectId, setActiveProjectId] = useState(null);
+
+  // Extract project ID from URL if available
+  useEffect(() => {
+    const match = location.pathname.match(/\/projects\/([^/]+)/);
+    if (match) {
+      setActiveProjectId(match[1]);
+    } else {
+      const taskMatch = location.pathname.match(/\/tasks\/project\/([^/]+)/);
+      if (taskMatch) {
+        setActiveProjectId(taskMatch[1]);
+      }
+    }
+  }, [location]);
 
   const handleLogout = () => {
     logout();
@@ -21,13 +36,16 @@ const Navbar = () => {
 
   // Planzo core links
   const links = [
-    
     { path: '/', name: 'Team', icon: <Users size={20} /> },
     { path: '/create-team', name: 'Create Team', icon: <UserPlus size={20} /> },
     { path: '/projects', name: 'Projects', icon: <ClipboardList size={20} /> },
     { path: '/tasks', name: 'Tasks', icon: <Calendar size={20} /> },
-    { path: '/reports', name: 'Reports', icon: <BarChart2 size={20} /> },
-    
+    { 
+      path: activeProjectId ? `/reports/project/${activeProjectId}` : '#',
+      name: 'Reports', 
+      icon: <FileText size={20} />,
+      onClick: activeProjectId ? null : () => toast.error('Please select a project first') 
+    },
   ];
 
   return (
@@ -49,7 +67,12 @@ const Navbar = () => {
                     <Link
                       key={link.path}
                       to={link.path}
-                      className="flex items-center gap-2 text-gray-300 hover:text-cyan-400 transition-colors"
+                      onClick={link.onClick}
+                      className={`flex items-center gap-2 ${
+                        location.pathname === link.path 
+                          ? 'text-cyan-400' 
+                          : 'text-gray-300 hover:text-cyan-400'
+                      } transition-colors relative`}
                     >
                       {link.icon}
                       <span>{link.name}</span>

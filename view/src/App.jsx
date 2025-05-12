@@ -17,6 +17,7 @@ import ProjectsPage from "./pages/ProjectsPage"
 import ProjectDetailPage from "./pages/ProjectDetailPage"
 import TasksPage from "./pages/TasksPage"
 import ProjectTasksPage from "./pages/ProjectTasksPage"
+import ReportsPage from "./pages/ReportsPage"
 
 
 const App = () => {
@@ -51,6 +52,7 @@ const App = () => {
             <Route path="/projects/:projectId" element = { authUser? <ProjectDetailPage/> : <Navigate to="/login"/>} />
             <Route path="/tasks" element = { authUser? <TasksPage/> : <Navigate to="/login"/>} />
             <Route path="/tasks/project/:projectId" element = { authUser? <ProjectTasksPage/> : <Navigate to="/login"/>} />
+            <Route path="/reports/project/:projectId" element = { authUser? <ReportsPage/> : <Navigate to="/login"/>} />
         </Routes>
       <Toaster position="top-right"/>
     </div>
