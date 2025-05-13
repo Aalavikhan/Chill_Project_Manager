@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import {
   Bell, User, LockKeyhole,
   LayoutDashboard, ClipboardList,
-  Users, CalendarDays, BarChart2, UserPlus
+  Users, CalendarDays, BarChart2, UserPlus, FileStack, BarChart
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,10 +25,17 @@ const Navbar = () => {
     { path: '/', name: 'Team', icon: <Users size={20} /> },
     { path: '/create-team', name: 'Create Team', icon: <UserPlus size={20} /> },
     { path: '/projects', name: 'Projects', icon: <ClipboardList size={20} /> },
+    { path: '/project-template', name: 'Templates', icon: <FileStack size={20} /> },
     { path: '/tasks', name: 'Tasks', icon: <ClipboardList size={20} /> },
-    { path: '/reports', name: 'Reports', icon: <BarChart2 size={20} /> },
+
+    
     
   ];
+
+  const adminLinks = [
+    { path: '/', name: 'User Reports', icon: <BarChart2 size={20} /> },
+    { path: '/team-reports', name: 'Team Reports', icon: <BarChart size={20} /> },
+  ]
 
   return (
     <nav className="bg-[#1E1E2E] shadow-md fixed w-full z-10 border-b border-gray-700">
@@ -43,8 +50,32 @@ const Navbar = () => {
           <div className="flex items-center gap-8">
             {authUser ? (
               <>
-                {/* Role-based links */}
-                <div className="hidden md:flex items-center gap-4">
+                { authUser.role.toLowerCase() === "admin" ? (
+                    <div className="hidden md:flex items-center gap-4">
+                    {adminLinks.map(adminLinks => (
+                      <Link
+                        key={adminLinks.path}
+                        to={adminLinks.path}
+                        className="flex items-center gap-2 text-gray-300 hover:text-cyan-400 transition-colors"
+                      >
+                        {adminLinks.icon}
+                        <span>{adminLinks.name}</span>
+                      </Link>
+                    ))}
+  
+                    {/* Notification */}
+                    <button
+                      onClick={() => toast('No new notifications')}
+                      className="relative text-gray-300 hover:text-cyan-400"
+                    >
+                      <Bell size={20} />
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                        0
+                      </span>
+                    </button>
+                  </div>
+                ):(
+                  <div className="hidden md:flex items-center gap-4">
                   {links.map(link => (
                     <Link
                       key={link.path}
@@ -67,6 +98,9 @@ const Navbar = () => {
                     </span>
                   </button>
                 </div>
+                )}
+
+
 
                 {/* Profile dropdown */}
                 <div className="relative">
