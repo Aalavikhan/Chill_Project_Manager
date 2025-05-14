@@ -4,6 +4,38 @@ import { User } from '../models/userModel.js';
 import { ActivityLog } from '../models/activityLogModel.js';
 import mongoose from 'mongoose';
 
+// Get all tasks for the current user
+export const getAllUserTasks = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Find all projects where the user is a member
+    const userProjects = await Project.find({
+      'members.user': userId
+    }).select('_id name');
+
+    // Find all tasks from these projects
+    const tasks = await Task.find({
+      project: { $in: userProjects.map(p => p._id) }
+    })
+      .populate('assignee', 'name email profileImage')
+      .populate('project', 'name description')
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      tasks
+    });
+  } catch (error) {
+    console.error("Error fetching user tasks:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch tasks",
+      error: error.message
+    });
+  }
+};
+
 // Create a new task
 export const createTask = async (req, res) => {
   try {

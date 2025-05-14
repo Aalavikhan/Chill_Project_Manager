@@ -38,6 +38,8 @@ axiosInstance.interceptors.response.use(
     error => {
         if (error.response) {
             console.error(`Response error ${error.response.status} from ${error.config?.url}:`, error.response.data);
+            console.error('Error response headers:', error.response.headers);
+            console.error('Request data:', error.config?.data);
             
             // Handle 401 unauthorized errors (token expired or invalid)
             if (error.response.status === 401) {
@@ -45,7 +47,8 @@ axiosInstance.interceptors.response.use(
                 // Could redirect to login or clear auth state here
             }
         } else if (error.request) {
-            console.error('No response received:', error.request);
+            console.error('No response received. Request details:', error.config);
+            console.error('Request object:', error.request);
         } else {
             console.error('Error setting up request:', error.message);
         }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getKanbanBoard, moveTaskToColumn, reorderTasks } from '../controllers/kanbanController.js';
+import { getKanbanBoard, moveTask } from '../controllers/kanbanController.js';
 import { verifyToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -11,9 +11,6 @@ router.use(verifyToken);
 router.get('/project/:projectId', getKanbanBoard);
 
 // Move task to a different column
-router.put('/task/:taskId/move', moveTaskToColumn);
-
-// Reorder tasks within a column
-router.put('/reorder', reorderTasks);
+router.put('/task/:taskId/move', moveTask);
 
 export default router; 

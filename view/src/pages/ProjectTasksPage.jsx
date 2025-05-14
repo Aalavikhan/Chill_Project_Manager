@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, ArrowLeft, Calendar, Clock, AlertTriangle, CheckCircle, Users, Edit, Search, Filter, SlidersHorizontal, RefreshCw, FileText } from 'lucide-react';
+import { Plus, ArrowLeft, Calendar, Clock, AlertTriangle, CheckCircle, Users, Edit, Search, Filter, RefreshCw, FileText } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import CreateTaskModal from '../components/CreateTaskModal';
@@ -135,10 +135,14 @@ const ProjectTasksPage = () => {
   const handleUpdateTask = async (taskId, taskData) => {
     try {
       console.log('Updating task with data:', taskData);
-      console.log(`API URL: ${import.meta.env.VITE_API_URL}/api/projects/${projectId}/tasks/${taskId}`);
+      console.log(`Task ID: ${taskId}`);
+      
+      // Ensure the correct API URL structure
+      const apiUrl = `${import.meta.env.VITE_API_URL}/api/projects/${projectId}/tasks/${taskId}`;
+      console.log(`Sending PATCH request to: ${apiUrl}`);
       
       const response = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/projects/${projectId}/tasks/${taskId}`,
+        apiUrl,
         taskData,
         { withCredentials: true }
       );
@@ -150,8 +154,14 @@ const ProjectTasksPage = () => {
       setCurrentTask(null);
     } catch (error) {
       console.error('Error updating task:', error);
-      console.error('Error details:', error.response?.data);
-      toast.error(error.response?.data?.message || 'Failed to update task');
+      console.error('Error response status:', error.response?.status);
+      console.error('Error response data:', error.response?.data);
+      
+      if (error.response) {
+        toast.error(`Failed to update task: ${error.response.data?.message || error.response.statusText}`);
+      } else {
+        toast.error(`Network error: ${error.message}`);
+      }
     }
   };
 
@@ -206,6 +216,28 @@ const ProjectTasksPage = () => {
     // Filter out current status
     const availableOptions = statusOptions.filter(option => option.value !== currentStatus);
 
+    const moveTaskToColumn = async (taskId, column) => {
+      try {
+        console.log(`Moving task ${taskId} to column ${column}`);
+        const apiUrl = `${import.meta.env.VITE_API_URL}/api/kanban/task/${taskId}/move`;
+        console.log(`Sending PUT request to: ${apiUrl}`);
+        
+        const response = await axios.put(
+          apiUrl,
+          { column },
+          { withCredentials: true }
+        );
+        
+        console.log('Move task response:', response.data);
+        toast.success(`Task moved to ${column}`);
+        fetchTasks();
+      } catch (error) {
+        console.error('Error moving task:', error);
+        console.error('Error response data:', error.response?.data);
+        toast.error(`Failed to move task: ${error.response?.data?.message || error.message}`);
+      }
+    };
+
     return (
       <div className="relative">
         <button
@@ -229,7 +261,7 @@ const ProjectTasksPage = () => {
               <button
                 key={option.value}
                 onClick={() => {
-                  handleUpdateTask(task._id, { status: option.value });
+                  moveTaskToColumn(task._id, option.value);
                   setIsOpen(false);
                 }}
                 className={`w-full text-left px-3 py-1.5 text-xs ${option.color} hover:bg-gray-700 transition-colors`}

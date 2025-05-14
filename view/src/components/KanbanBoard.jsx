@@ -6,9 +6,9 @@ import toast from 'react-hot-toast';
 
 const KanbanBoard = ({ projectId }) => {
   const [columns, setColumns] = useState({
-    'To Do': [],
-    'In Progress': [],
-    'Done': []
+    'Assigned': [],
+    'Ongoing': [],
+    'Completed': []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -92,18 +92,18 @@ const KanbanBoard = ({ projectId }) => {
 
   const getColumnColor = (columnId) => {
     switch (columnId) {
-      case 'To Do': return 'from-gray-700 to-gray-800 border-gray-600';
-      case 'In Progress': return 'from-blue-700/20 to-blue-900/20 border-blue-700/50';
-      case 'Done': return 'from-green-700/20 to-green-900/20 border-green-700/50';
+      case 'Assigned': return 'from-gray-700 to-gray-800 border-gray-600';
+      case 'Ongoing': return 'from-blue-700/20 to-blue-900/20 border-blue-700/50';
+      case 'Completed': return 'from-green-700/20 to-green-900/20 border-green-700/50';
       default: return 'from-gray-700 to-gray-800 border-gray-600';
     }
   };
 
   const getColumnIcon = (columnId) => {
     switch (columnId) {
-      case 'To Do': return <Clock className="text-gray-400" size={18} />;
-      case 'In Progress': return <AlertCircle className="text-blue-400" size={18} />;
-      case 'Done': return <CheckCircle className="text-green-400" size={18} />;
+      case 'Assigned': return <Clock className="text-gray-400" size={18} />;
+      case 'Ongoing': return <AlertCircle className="text-blue-400" size={18} />;
+      case 'Completed': return <CheckCircle className="text-green-400" size={18} />;
       default: return <Clock className="text-gray-400" size={18} />;
     }
   };

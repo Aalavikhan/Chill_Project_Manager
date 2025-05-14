@@ -334,12 +334,16 @@ export const removeProjectMember = async (req, res) => {
     const { projectId, memberId } = req.params;
     const currentUserId = req.user.id;
 
+    console.log(`Attempting to remove member ${memberId} from project ${projectId} by user ${currentUserId}`);
+
     if (!mongoose.Types.ObjectId.isValid(projectId) || !mongoose.Types.ObjectId.isValid(memberId)) {
+      console.log('Invalid ObjectID format:', { projectId, memberId });
       return res.status(400).json({ message: "Invalid project ID or member ID" });
     }
 
     const project = await Project.findById(projectId);
     if (!project) {
+      console.log(`Project not found with ID ${projectId}`);
       return res.status(404).json({ message: "Project not found" });
     }
 
@@ -347,6 +351,8 @@ export const removeProjectMember = async (req, res) => {
     const isOwner = project.members.some(
       member => member.user.toString() === currentUserId && member.role === 'Owner'
     );
+
+    console.log(`Request from user ${currentUserId}, isOwner: ${isOwner}`);
 
     if (!isOwner) {
       return res.status(403).json({ message: "Only the project owner can remove members" });
@@ -358,8 +364,21 @@ export const removeProjectMember = async (req, res) => {
     );
 
     if (memberIsOwner) {
+      console.log(`Cannot remove owner from project`);
       return res.status(400).json({ message: "Cannot remove the project owner" });
     }
+
+    // Check if the member exists in the project
+    const memberExists = project.members.some(
+      member => member.user.toString() === memberId
+    );
+
+    if (!memberExists) {
+      console.log(`Member ${memberId} not found in project ${projectId}`);
+      return res.status(404).json({ message: "Member not found in this project" });
+    }
+
+    console.log(`Member found in project. Removing...`);
 
     // Remove member from project
     project.members = project.members.filter(member => member.user.toString() !== memberId);
@@ -369,6 +388,8 @@ export const removeProjectMember = async (req, res) => {
     await User.findByIdAndUpdate(memberId, {
       $pull: { projects: projectId }
     });
+
+    console.log(`Member ${memberId} successfully removed from project ${projectId}`);
 
     return res.status(200).json({
       success: true,

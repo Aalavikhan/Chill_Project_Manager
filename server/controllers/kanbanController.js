@@ -21,9 +21,9 @@ export const getKanbanBoard = async (req, res) => {
 
     // Organize tasks by column
     const columns = {
-      'To Do': [],
-      'In Progress': [],
-      'Done': []
+      'Assigned': [],
+      'Ongoing': [],
+      'Completed': []
     };
 
     // Add custom columns from project if needed
@@ -31,11 +31,17 @@ export const getKanbanBoard = async (req, res) => {
 
     // Group tasks by column
     tasks.forEach(task => {
-      if (columns[task.kanbanColumn]) {
-        columns[task.kanbanColumn].push(task);
+      // Map old statuses to new ones if needed
+      let status = task.status;
+      if (status === 'To Do') status = 'Assigned';
+      if (status === 'In Progress') status = 'Ongoing';
+      if (status === 'Done') status = 'Completed';
+      
+      if (columns[status]) {
+        columns[status].push(task);
       } else {
-        // Default to 'To Do' if column doesn't exist
-        columns['To Do'].push(task);
+        // Default to 'Assigned' if column doesn't exist
+        columns['Assigned'].push(task);
       }
     });
 
@@ -45,55 +51,69 @@ export const getKanbanBoard = async (req, res) => {
   }
 };
 
-// Move task to a different column
-export const moveTaskToColumn = async (req, res) => {
+// Move a task to a different column
+export const moveTask = async (req, res) => {
   try {
     const { taskId } = req.params;
     const { column } = req.body;
     const userId = req.user._id;
 
-    // Validate column
-    const validColumns = ['To Do', 'In Progress', 'Done'];
+    if (!column) {
+      return res.status(400).json({ message: "Column is required" });
+    }
+
+    // Valid columns
+    const validColumns = ['Assigned', 'Ongoing', 'Completed'];
     if (!validColumns.includes(column)) {
       return res.status(400).json({ message: "Invalid column" });
     }
 
-    // Find the task
+    // Map column to status
+    let status = column;
+
+    // Find and update the task
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Update task status based on column
-    let status = task.status;
-    if (column === 'Done') {
-      status = 'Done';
-      task.completedAt = new Date();
-    } else if (column === 'In Progress') {
-      status = 'In Progress';
-    } else {
-      status = 'To Do';
+    // Check if user has access to the project
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    // Update the task
+    // Update task
     task.kanbanColumn = column;
     task.status = status;
+    
+    // Set completedAt date if moved to Completed column
+    if (column === 'Completed' && !task.completedAt) {
+      task.completedAt = new Date();
+    } else if (column !== 'Completed') {
+      task.completedAt = null;
+    }
+
     await task.save();
 
-    // Log the activity
+    // Log activity
     await ActivityLog.create({
       userId,
       entityType: 'Task',
       entityId: taskId,
       action: 'Updated',
       details: { 
-        previousColumn: task.kanbanColumn, 
-        newColumn: column 
+        taskTitle: task.title,
+        updates: { status, kanbanColumn: column }
       },
       projectId: task.project
     });
 
-    res.status(200).json({ message: "Task moved successfully", task });
+    res.status(200).json({ 
+      success: true,
+      message: "Task moved successfully",
+      task
+    });
   } catch (error) {
     res.status(500).json({ message: "Error moving task", error: error.message });
   }

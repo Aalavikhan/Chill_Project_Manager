@@ -36,12 +36,12 @@ const taskSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['To Do', 'In Progress', 'Done'],
-    default: 'To Do'
+    enum: ['Assigned', 'Ongoing', 'Completed', 'To Do', 'In Progress', 'Done'],
+    default: 'Assigned'
   },
   kanbanColumn: {
     type: String,
-    default: 'To Do'
+    default: 'Assigned'
   },
   tags: [{
     type: mongoose.Schema.Types.ObjectId,

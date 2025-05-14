@@ -8,7 +8,7 @@ const CreateTaskModal = ({ isOpen, onClose, onCreateTask, projectMembers, projec
     assigneeId: '',
     dueDate: '',
     priority: 'Medium',
-    status: 'To Do'
+    status: 'Assigned'
   });
 
   // Combine project members and team members for the assignee dropdown
@@ -153,9 +153,9 @@ const CreateTaskModal = ({ isOpen, onClose, onCreateTask, projectMembers, projec
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-900/50 text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 border border-gray-600/50"
             >
-              <option value="To Do">To Do</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
+              <option value="Assigned">Assigned</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
 

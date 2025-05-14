@@ -82,17 +82,21 @@ const ProjectDetailPage = () => {
     }
   };
 
-  const handleRemoveMember = async (memberId) => {
+  const handleRemoveMember = async (userId) => {
     if (window.confirm('Are you sure you want to remove this member?')) {
       try {
+        console.log(`Removing member with user ID: ${userId}`);
+        
         const response = await axiosInstance.delete(
-          `/projects/${projectId}/members/${memberId}`
+          `/projects/${projectId}/members/${userId}`
         );
         
+        console.log('Remove member response:', response.data);
         toast.success('Member removed successfully');
         fetchProjectData();
       } catch (error) {
         console.error('Error removing member:', error);
+        console.error('Error details:', error.response?.data);
         toast.error(error.response?.data?.message || 'Failed to remove member');
       }
     }
@@ -282,7 +286,7 @@ const ProjectDetailPage = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             {member.role !== 'Owner' && (
                               <button
-                                onClick={() => handleRemoveMember(member._id)}
+                                onClick={() => handleRemoveMember(member.user._id)}
                                 className="text-red-400 hover:text-red-300"
                               >
                                 Remove
